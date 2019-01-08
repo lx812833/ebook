@@ -1,5 +1,6 @@
 # ebook
-
+npm i --save epubjs 安装epubjs
+https://icomoon.io/app/#/select  将字体图标设置为svg格式并下载到本地
 ## Project setup
 ```
 npm install
