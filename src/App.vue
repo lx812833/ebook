@@ -4,22 +4,26 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
     </div>
-    <router-view/>
+    <span class="text">ABCDEF</span>
+    <router-view />
   </div>
 </template>
-<style lang="stylus">
-#app
-  font-family 'Avenir', Helvetica, Arial, sans-serif
-  -webkit-font-smoothing antialiased
-  -moz-osx-font-smoothing grayscale
-  text-align center
-  color #2c3e50
+<script>
+export default {};
+// 设置rem
+document.addEventListener("DOMContentLoaded", () => {
+  const html = document.querySelector("html");
+  let fontSize = window.innerWidth / 10;
+  fontSize = fontSize > 50 ? 50 : fontSize;
+  html.style.fontSize = fontSize + "px";
+});
+</script>
 
-#nav
-  padding 30px
-  a
-    font-weight bold
-    color #2c3e50
-    &.router-link-exact-active
-      color #42b983
+<style lang="scss" scoped>
+@import "./assets/styles/global";
+.text {
+  font-family: "Days One";
+  font-size: px2rem(20);
+  color: orange;
+}
 </style>
