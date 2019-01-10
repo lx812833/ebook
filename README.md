@@ -32,3 +32,6 @@ import './assets/styles/icon.css'
 // 安装epubjs
 npm i --save epubjs
 ```
+
+
+阅读器解析与渲染

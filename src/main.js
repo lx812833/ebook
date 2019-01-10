@@ -7,7 +7,6 @@ import store from './store'
 import './assets/styles/icon.css'
 // 引入字体(方法2)
 // import './assets/fonts/daysOne.css'
-
 // 导入全局global样式
 import './assets/styles/global.scss'
 Vue.config.productionTip = false
