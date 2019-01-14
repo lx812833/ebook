@@ -1,22 +1,53 @@
-import { mapGetters, mapActions } from 'vuex'
+import {
+    mapGetters,
+    mapActions
+} from 'vuex'
 
 export const ebookMixin = {
     computed: {
         ...mapGetters([
-            "fileName",
-            "menuVisible",
-            "settingVisible",
-            "defaultFontSize"
+            'fileName',
+            'menuVisible',
+            'settingVisible',
+            'defaultFontSize',
+            'defaultFontFamily',
+            'fontFamilyVisible',
+            'defaultTheme',
+            'bookAvailable',
+            'progress',
+            'section',
+            'isPaginating',
+            'currentBook',
+            'navigation',
+            'cover',
+            'metadata',
+            'paginate',
+            'pagelist',
+            'offsetY',
+            'isBookmark'
         ])
     },
     methods: {
         ...mapActions([
-            "setMenuVisible",
-            "setFileName",
-            "setSettingVisible",
-            "setDefaultFontSize"
+            'setFileName',
+            'setMenuVisible',
+            'setSettingVisible',
+            'setDefaultFontSize',
+            'setDefaultFontFamily',
+            'setFontFamilyVisible',
+            'setDefaultTheme',
+            'setBookAvailable',
+            'setProgress',
+            'setSection',
+            'setIsPaginating',
+            'setCurrentBook',
+            'setNavigation',
+            'setCover',
+            'setMetadata',
+            'setPaginate',
+            'setPagelist',
+            'setOffsetY',
+            'setIsBookmark'
         ])
     },
 }
-
-// 以后修改只在一处修改件就行
