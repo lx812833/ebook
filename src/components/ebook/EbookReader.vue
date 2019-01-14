@@ -21,9 +21,9 @@ export default {
   },
   methods: {
     initEpub() {
-      const baseUrl =
-        "http://192.168.31.178:9000/epub/" + this.fileName + ".epub";
+      const baseUrl = "http://192.168.31.178:9000/epub/" + this.fileName + ".epub";
       this.book = new Epub(baseUrl);
+      this.setCurrentBook(this.book)
       console.log(this.book);
       // 渲染电子书 epub自带的方法       绑定#read
       this.rendition = this.book.renderTo("read", {
@@ -80,7 +80,7 @@ export default {
     // 翻页时隐藏导航栏
     hideTitleAndMenu() {
       this.setMenuVisible(false);
-      this.setSettingVisible(-1);
+      this.setSettingVisible(-1); // -1隐藏状态
     }
   }
 };

@@ -1,38 +1,29 @@
 <template>
   <div>
     <transition>
-      <div
-        class="setting-wrapper"
-        v-show="menuVisible && settingVisible=== 0"
-      >
+      <div class="setting-wrapper" v-show="menuVisible && settingVisible=== 0">
         <div class="setting-font-size">
-          <div
-            class="preview"
-            :style="{fontSize: fontSizeList[0].fontSize + 'px'}"
-          >A</div>
+          <div class="preview" :style="{fontSize: fontSizeList[0].fontSize + 'px'}" >A</div>
           <div class="select">
-            <div
-              class="select-wrapper"
-              v-for="(item, index) in fontSizeList"
-              :key="index"
-              @click="setFontSize(item.fontSize)"
-            >
+            <div class="select-wrapper" v-for="(item, index) in fontSizeList" :key="index" @click="setFontSize(item.fontSize)">
               <div class="line"></div>
               <div class="point-wrapper">
-                <div
-                  class="point"
-                  v-show="defaultFontSize === item.fontSize"
-                >
+                <div class="point" v-show="defaultFontSize === item.fontSize" >
                   <div class="small-point"></div>
                 </div>
               </div>
               <div class="line"></div>
             </div>
           </div>
-          <div
-            class="preview"
-            :style="{fontSize: fontSizeList[fontSizeList.length - 1].fontSize + 'px'}"
-          >A</div>
+          <div class="preview" :style="{fontSize: fontSizeList[fontSizeList.length - 1].fontSize + 'px'}">A</div>
+        </div>
+        <div class="setting-font-family" @click="showFontFamilyPopup">
+          <div class="setting-font-family-text-wrapper">
+            <span class="setting-font-family-text">{{ defaultFontFamily }}</span>
+          </div>
+          <div class="setting-font-family-icon-wrapper">
+            <span class="icon-forward"></span>
+          </div>
         </div>
       </div>
     </transition>
@@ -50,8 +41,15 @@ export default {
     };
   },
   methods: {
+    // 设置字号大小
     setFontSize(fontSize) {
-        console.log('fontSize')
+      this.setDefaultFontSize(fontSize)
+      this.currentBook.rendition.themes.fontSize(fontSize)
+    },
+    // 字体样式弹出层
+    showFontFamilyPopup() {
+      console.log('asdad')
+      this.setFontFamilyVisible(true)
     }
   }
 };
@@ -60,6 +58,8 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/styles/global";
 .setting-wrapper {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   bottom: px2rem(48);
   left: 0;
@@ -70,6 +70,7 @@ export default {
   box-shadow: 0 px2rem(-8) px2rem(8) rgba(0, 0, 0, 0.15);
   .setting-font-size {
     display: flex;
+    flex: 2; // 占 2/3
     height: 100%;
     .preview {
       flex: 0 0 px2rem(40);
@@ -127,6 +128,17 @@ export default {
           }
         }
       }
+    }
+  }
+  .setting-font-family {
+    flex: 1; // 占1/3
+    font-size: px2rem(14);
+    @include center;
+    .setting-font-family-text-wrapper {
+      @include center;
+    }
+    .setting-font-family-icon-wrapper {
+      @include center;
     }
   }
 }
