@@ -8,6 +8,7 @@
 // 引入mixin
 import { ebookMixin } from "../../utils/mixin";
 import Epub from "epubjs";
+import { promises } from "fs";
 global.Epub = Epub;
 export default {
   // 使用vuex mixins
@@ -21,9 +22,9 @@ export default {
   },
   methods: {
     initEpub() {
-      const baseUrl = "http://192.168.31.178:9000/epub/" + this.fileName + ".epub";
+      const baseUrl ="http://192.168.31.178:9000/epub/" + this.fileName + ".epub";
       this.book = new Epub(baseUrl);
-      this.setCurrentBook(this.book)
+      this.setCurrentBook(this.book);
       console.log(this.book);
       // 渲染电子书 epub自带的方法       绑定#read
       this.rendition = this.book.renderTo("read", {
@@ -54,6 +55,21 @@ export default {
         // event.preventDefault();
         event.stopPropagation();
       });
+      // 引入放入Nginx中的字体样式
+      this.rendition.hooks.content.register(contents => {
+        Promise.all([
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/cabin.css`),
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`),
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`)
+        ]).then(res => {
+          console.log("字体全部加载完成...");
+        });
+      });
     },
     // 上一页
     prevPage() {
@@ -71,8 +87,9 @@ export default {
     },
     // 切换导航栏
     toggleTitleAndMenu() {
-      if(this.menuVisible) {
+      if (this.menuVisible) {
         this.setSettingVisible(-1);
+        this.setFontFamilyVisible(false); // 隐藏字号样式
       }
       // this.$store.dispatch("setMenuVisible", !this.menuVisible);
       this.setMenuVisible(!this.menuVisible);
@@ -81,6 +98,7 @@ export default {
     hideTitleAndMenu() {
       this.setMenuVisible(false);
       this.setSettingVisible(-1); // -1隐藏状态
+      this.setFontFamilyVisible(false);
     }
   }
 };
