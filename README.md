@@ -211,3 +211,152 @@ children: [
   ```
 
 最后在`main.js`里引入`store`: `import store from './store'`
+
+#### 2.3、**`mixins`** 混入
+
+混入 **`mixins`** 是一种分发 `Vue`组件中可复用功能的非常灵活的方式。**混入对象**可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被混入该组件本身的选项。
+
+全局注册一个**混入**，影响注册之后所有创建的每个 `Vue` 实例
+
+**`mapActions`**
+
+组件中使用`this.$store.dispatch('xxx')`  分发`action`，或者使用 **`mapActions`** 辅助函数将组件的`methods` 映射为  `store.dispatch`
+
+- 在`src/store/actions.js`中定义`actions`
+
+  ```python
+  const actions = {
+      setFileName: ({ commit }, fileName) => {
+          return commit('SET_FILENAME', fileName)
+          // 需要return才能返回一个promise对象
+      },
+      setMenuVisible: ({ commit }, menuVisible) => {
+          return commit('SET_MENUVISIBLE', menuVisible)
+      }
+   }
+
+   export default actions
+  ```
+
+- 在`src/store/getters.js`中定义 `getters.js`
+
+  ```python
+  const book = {
+      fileName: state => state.book.fileName,
+      menuVisible: state => state.book.menuVisible
+  }
+
+  export default book
+  ```
+
+- 在`src/utils/mixin.js`中创建`mixin.js`
+  ```python
+  import { mapGetters, mapActions } from 'vuex'
+  export const ebookMixin = {
+    computed:{
+        ...mapGetters([
+            "fileName",
+            "menuVisible",
+            // 这里是 getters 暴露 state中的对象
+        ])
+    },
+    methods: {
+        ...mapActions([
+            "setMenuVisible",
+            "setFileName",
+            //  这里是定义 actions.js中分发 mutations 中的方法
+        ])
+    }
+  }
+  ```
+
+最后在组件中引入`mixins`并使用`mixins`
+
+```python
+import { ebookMixin } from "../../utils/mixin";
+
+// 使用mixins
+ mixins: [ebookMixin]
+```
+
+使用`mixins`中定义的方法时，直接`this.+函数名`，如`this.setFileName()`
+
+
+### 3、阅读器开发
+
+#### 3.1、标题栏和菜单栏实现
+
+> **`transition`**
+
+[**`transition`**](https://cn.vuejs.org/v2/guide/transitions.html)过渡，官网有具体而详细的讲解。
+在`src/components/ebook`下分别新建`EbookTitle.vue`、`EbookMenu.vue`作为顶部标题栏，底部菜单栏。为了使其过渡流程，需使用 **`transition`**
+
+`<transition>` 元素作为单个元素/组件的过渡效果。`<transition>` 只会把过渡效果应用到其包裹的内容上，而不会额外渲染 `DOM` 元素，也不会出现在检测过的组件层级中。
+
+`动态组件`
+
+```python
+<transition name="fade" mode="out-in" appear>  
+    <component :is="view"></component>
+ </transition>
+```
+`transition.css`
+
+```python
+.slide-down-enter, .slide-down-leave-to {
+    transform: translate3d(0, -100%, 0)
+ }
+```
+
+> **`切换标题栏和菜单栏`**
+
+如同电子阅读类App一样，通过手势来实现上/下页滑动、切换标题栏和菜单栏等。`Epub`集成了手势操作类方法。
+
+```python
+// 手势操作
+this.rendition.on("touchstart", event => {
+    this.touchStartX = event.changedTouches[0].clientX;
+    this.touchStartTime = event.timeStamp;
+});
+
+this.rendition.on("touchend", event => {
+    // 滑动x轴偏移量
+    const offsetX = event.changedTouches[0].clientX - this.touchStartX;
+    // 滑动时间差
+    const time = event.timeStamp - this.touchStartTime;
+    // console.log(offsetX, time);
+    if (time < 500 && offsetX > 40) {
+        this.prevPage();   // 上一页
+    } else if (time < 500 && offsetX < -40) {
+        this.nextPage();  // 下一页
+    } else {
+        this.toggleTitleAndMenu();  // 切换标题栏和菜单栏
+    }
+// 停止事件默认动作及传播
+// event.preventDefault();
+event.stopPropagation();});
+```
+
+算了，get不到`Epub`使用方法，学习了解其手势操作的思想才是正道。这个项目最大的学习收获我觉得应该是 **`Vuex`** 
+
+> **`Vuex在项目中的具体使用`** 
+
+`Vuex` 的状态存储是响应式的。当 `Vue` 组件从 `store` 中读取状态的时候，若 `store` 中的状态发生变化，那么相应的组件也会相应地得到高效更新。所以说，这就十分有利于使用函数操作`store`里的变量。
+
+在没有使用 **`mixins`** 时，使用`$store.dispatch`分发
+
+```python
+this.$store.dispatch("setMenuVisible", !this.menuVisible);
+```
+
+引入 **`mixins`** 后
+
+```python
+this.setMenuVisible(!this.menuVisible);
+```
+
+
+
+
+WebStorageCache 对HTML5 localStorage 和sessionStorage 进行了扩展，添加了超时时间，序列化方法。可以直接存储json对象，同时可以非常简单的进行超时时间的设置。
+https://www.oschina.net/p/web-storage-cache/related
