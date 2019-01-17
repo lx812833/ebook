@@ -24,6 +24,7 @@
 <script>
 import { FONT_FAMILY } from "../../utils/book";
 import { ebookMixin } from "../../utils/mixin";
+import { saveFontFamily } from "../../utils/localStorage"
 export default {
   mixins: [ebookMixin],
   data() {
@@ -41,6 +42,8 @@ export default {
     // 改变字体弹窗字体
     setFontFamily(font) {
         this.setDefaultFontFamily(font);
+        // 存入localStorage中
+        saveFontFamily(this.fileName, font)
         if(font === 'Default') {
             this.currentBook.rendition.themes.font('Times New Roman');
         } else {

@@ -8,7 +8,12 @@
 // 引入mixin
 import { ebookMixin } from "../../utils/mixin";
 import Epub from "epubjs";
-import { promises } from "fs";
+import {
+  saveFontFamily,
+  getFontFamily,
+  getFontSize,
+  saveFontSize
+} from "../../utils/localStorage";
 global.Epub = Epub;
 export default {
   // 使用vuex mixins
@@ -22,7 +27,8 @@ export default {
   },
   methods: {
     initEpub() {
-      const baseUrl ="http://192.168.31.178:9000/epub/" + this.fileName + ".epub";
+      const baseUrl =
+        "http://192.168.31.178:9000/epub/" + this.fileName + ".epub";
       this.book = new Epub(baseUrl);
       this.setCurrentBook(this.book);
       console.log(this.book);
@@ -32,7 +38,11 @@ export default {
         height: innerHeight,
         method: "default" // 微信兼容性配置
       });
-      this.rendition.display();
+      // 初始化字体样式、大小
+      this.rendition.display().then(() => {
+        this.initFontSize();
+        this.initFontFamily();
+      });
       // 手势操作
       this.rendition.on("touchstart", event => {
         this.touchStartX = event.changedTouches[0].clientX;
@@ -59,17 +69,41 @@ export default {
       this.rendition.hooks.content.register(contents => {
         Promise.all([
           contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/cabin.css`),
+            `${process.env.VUE_APP_RES_URL}/fonts/cabin.css`
+          ),
           contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
+            `${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`
+          ),
           contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`),
+            `${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`
+          ),
           contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`)
+            `${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`
+          )
         ]).then(res => {
           console.log("字体全部加载完成...");
         });
       });
+    },
+    // 设置字体样式
+    initFontFamily() {
+      let font = getFontFamily(this.fileName);
+      if (!font) {
+        saveFontFamily(this.fileName, this.defaultFontFamily);
+      } else {
+        this.rendition.themes.font(font);
+        this.setDefaultFontFamily(font);
+      }
+    },
+    // 设置字体大小
+    initFontSize() {
+      let fontSize = getFontSize(this.fileName);
+      if (!fontSize) {
+        saveFontSize(this.fileName, this.defaultFontSize);
+      } else {
+        this.rendition.themes.fontSize(fontSize);
+        this.setDefaultFontSize(fontSize);
+      }
     },
     // 上一页
     prevPage() {
