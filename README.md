@@ -355,8 +355,77 @@ this.$store.dispatch("setMenuVisible", !this.menuVisible);
 this.setMenuVisible(!this.menuVisible);
 ```
 
+#### 3.2、WebStorageCache
+
+在 HTML5 中，新加入了一个`localStorage`特性，这个特性主要是用来作为`本地存储`来使用的，解决了`cookie`存储空间不足的问题(cookie 中每条 cookie 的存储空间为`4k`)，`localStorage`中一般浏览器支持的是`5M`大小，这个在不同的浏览器中 localStorage 会有所不同。
+
+**`WebStorageCache`**  对`HTML5 localStorage`和`sessionStorage`  进行了扩展，添加了超时时间，序列化方法。可以直接存储`json`对象，同时可以非常简单的进行超时时间的设置。
+
+具体使用方法可查看[WebStorageCache](https://www.npmjs.com/package/web-storage-cache)
+
+- 安装**WebStorageCache**
+  ```python
+  import Storage from "web-storage-cache"
+  ```
+- 在`src/utils` 下创建`localStorage.js`，并导入**WebStorageCache**
+  ```python
+  import Storage from "web-storage-cache";
+  const localStorage = new Storage()
+  ```
+
+**`WebStorageCache API`**
+
+- **set** 往缓存中插入数据
+
+```python
+export function setLocalStorage(key, value) {
+    return localStorage.set(key, value)
+ }
+```
+
+- **get** 根据`key`获取缓存中未超时数据。返回相应类型`String`、`Boolean`、`PlainObject`、`Array`的值。
+
+```python
+// 根据key获取缓存中未超时数据
+export function getLocalStorage(key) {
+    return localStorage.get(key)
+ }
+```
+
+- **delete** 根据`key`删除缓存中的值
+
+```python
+// 根据key删除缓存中的值。
+export function removeLocalStorage(key) {
+    return localStorage.delete(key)
+ }
+```
+
+- **clear** 清空缓存中全部的值
+
+```python
+// 清空缓存中全部的值
+export function clearLocalStorage() {
+    return localStorage.clear()
+}
+```
+
+- **WebStorageCache** 在组件中的具体使用
+
+```python
+import {saveFontFamily,getFontFamily,getFontSize,saveFontSize} from "../../utils/localStorage";
+
+直接调用localStorage中的函数就ok了
 
 
-
-WebStorageCache 对HTML5 localStorage 和sessionStorage 进行了扩展，添加了超时时间，序列化方法。可以直接存储json对象，同时可以非常简单的进行超时时间的设置。
-https://www.oschina.net/p/web-storage-cache/related
+// 设置字体样式
+initFontFamily() {
+    let font = getFontFamily(this.fileName);
+    if (!font) {
+        saveFontFamily(this.fileName, this.defaultFontFamily);
+    } else {
+        this.rendition.themes.font(font);
+        this.setDefaultFontFamily(font);
+    }
+ }
+```
