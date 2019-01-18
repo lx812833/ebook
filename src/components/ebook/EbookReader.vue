@@ -12,7 +12,10 @@ import {
   saveFontFamily,
   getFontFamily,
   getFontSize,
-  saveFontSize
+  saveFontSize,
+  saveTheme,
+  getTheme,
+  setDefaultTheme
 } from "../../utils/localStorage";
 global.Epub = Epub;
 export default {
@@ -42,6 +45,7 @@ export default {
       this.rendition.display().then(() => {
         this.initFontSize();
         this.initFontFamily();
+        this.initTheme();
       });
       // 手势操作
       this.rendition.on("touchstart", event => {
@@ -104,6 +108,19 @@ export default {
         this.rendition.themes.fontSize(fontSize);
         this.setDefaultFontSize(fontSize);
       }
+    },
+    // 设置主题
+    initTheme() {
+      let defaultTheme = getTheme(this.fileName);
+      if (!defaultTheme) {
+        defaultTheme = this.themeList[0].name;
+        this.setDefaultTheme(defaultTheme)
+        saveTheme(this.fileName, defaultTheme);
+      }
+      this.themeList.forEach(theme => {
+        this.rendition.themes.register(theme.name, theme.style);
+      });
+      this.rendition.themes.select(defaultTheme);
     },
     // 上一页
     prevPage() {
