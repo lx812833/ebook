@@ -72,30 +72,33 @@ export function themeList(vue) {
   ]
 }
 
-// export function addCss(href) {
-//   const link = document.createElement('link')
-//   link.setAttribute('rel', 'stylesheet')
-//   link.setAttribute('type', 'text/css')
-//   link.setAttribute('href', href)
-//   document.getElementsByTagName('head')[0].appendChild(link)
-// }
+// 全局样式的改变
+// DOM动态添加或删除CSS样式
+export function addCss(href) {
+  const link = document.createElement('link')
+  link.setAttribute('rel', 'stylesheet')
+  link.setAttribute('type', 'text/css')
+  link.setAttribute('href', href)
+  document.getElementsByTagName('head')[0].appendChild(link)
+}
 
-// export function removeCss(href) {
-//   const links = document.getElementsByTagName('link')
-//   for (let i = links.length; i >= 0; i--) {
-//     const link = links[i]
-//     if (link && link.getAttribute('href') && link.getAttribute('href') === href) {
-//       link.parentNode.removeChild(link)
-//     }
-//   }
-// }
+// 当多次点击切换样式时，header中会逐个加载，后面的覆盖前面的，影响渲染速度，故需要清除
+export function removeCss(href) {
+  const links = document.getElementsByTagName('link')
+  for (let i = links.length; i >= 0; i--) {
+    const link = links[i]
+    if (link && link.getAttribute('href') && link.getAttribute('href') === href) {
+      link.parentNode.removeChild(link)
+    }
+  }
+}
 
-// export function removeAllCss() {
-//   removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_default.css`)
-//   removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_eye.css`)
-//   removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_gold.css`)
-//   removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_night.css`)
-// }
+export function removeAllCss() {
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_default.css`)
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_eye.css`)
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_gold.css`)
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_night.css`)
+}
 
 // export function getReadTimeByMinute(fileName) {
 //   const readTime = getReadTime(fileName)
