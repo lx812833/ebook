@@ -31,7 +31,7 @@ export default {
   methods: {
     initEpub() {
       const baseUrl =
-        "http://192.168.31.178:9000/epub/" + this.fileName + ".epub";
+        process.env.VUE_APP_RES_URL + "/epub/" + this.fileName + ".epub";
       this.book = new Epub(baseUrl);
       this.setCurrentBook(this.book);
       console.log(this.book);
@@ -46,6 +46,7 @@ export default {
         this.initFontSize();
         this.initFontFamily();
         this.initTheme();
+        this.initGlobalStyle();
       });
       // 手势操作
       this.rendition.on("touchstart", event => {
@@ -114,14 +115,16 @@ export default {
       let defaultTheme = getTheme(this.fileName);
       if (!defaultTheme) {
         defaultTheme = this.themeList[0].name;
-        this.setDefaultTheme(defaultTheme)
         saveTheme(this.fileName, defaultTheme);
       }
+      this.setDefaultTheme(defaultTheme);
       this.themeList.forEach(theme => {
         this.rendition.themes.register(theme.name, theme.style);
       });
       this.rendition.themes.select(defaultTheme);
     },
+    // 设置全局主题
+    /** 在mixins中设置了 */
     // 上一页
     prevPage() {
       if (this.rendition) {
