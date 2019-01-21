@@ -281,25 +281,24 @@ import { ebookMixin } from "../../utils/mixin";
 
 使用`mixins`中定义的方法时，直接`this.+函数名`，如`this.setFileName()`
 
-
 ### 3、阅读器开发
 
 #### 3.1、标题栏和菜单栏实现
 
-> **`transition`**
+> transition
 
-[**`transition`**](https://cn.vuejs.org/v2/guide/transitions.html)过渡，官网有具体而详细的讲解。
 在`src/components/ebook`下分别新建`EbookTitle.vue`、`EbookMenu.vue`作为顶部标题栏，底部菜单栏。为了使其过渡流程，需使用 **`transition`**
 
-`<transition>` 元素作为单个元素/组件的过渡效果。`<transition>` 只会把过渡效果应用到其包裹的内容上，而不会额外渲染 `DOM` 元素，也不会出现在检测过的组件层级中。
+`<transition>`  元素作为单个元素/组件的过渡效果。`<transition>`  只会把过渡效果应用到其包裹的内容上，而不会额外渲染 `DOM` 元素，也不会出现在检测过的组件层级中。
 
 `动态组件`
 
 ```python
-<transition name="fade" mode="out-in" appear>  
+<transition name="fade" mode="out-in" appear>
     <component :is="view"></component>
  </transition>
 ```
+
 `transition.css`
 
 ```python
@@ -308,9 +307,9 @@ import { ebookMixin } from "../../utils/mixin";
  }
 ```
 
-> **`切换标题栏和菜单栏`**
+> 切换标题栏和菜单栏
 
-如同电子阅读类App一样，通过手势来实现上/下页滑动、切换标题栏和菜单栏等。`Epub`集成了手势操作类方法。
+如同电子阅读类 App 一样，通过手势来实现上/下页滑动、切换标题栏和菜单栏等。`Epub`集成了手势操作类方法。
 
 ```python
 // 手势操作
@@ -337,9 +336,9 @@ this.rendition.on("touchend", event => {
 event.stopPropagation();});
 ```
 
-算了，get不到`Epub`使用方法，学习了解其手势操作的思想才是正道。这个项目最大的学习收获我觉得应该是 **`Vuex`** 
+算了，get 不到`Epub`使用方法，学习了解其手势操作的思想才是正道。这个项目最大的学习收获我觉得应该是 **`Vuex`**
 
-> **`Vuex在项目中的具体使用`** 
+> **`Vuex在项目中的具体使用`**
 
 `Vuex` 的状态存储是响应式的。当 `Vue` 组件从 `store` 中读取状态的时候，若 `store` 中的状态发生变化，那么相应的组件也会相应地得到高效更新。所以说，这就十分有利于使用函数操作`store`里的变量。
 
@@ -429,3 +428,64 @@ initFontFamily() {
     }
  }
 ```
+
+#### 3.3、国际化——Vue-i18n 的使用
+
+`vue-i18n`是一个`vue`插件，主要作用就是让项目支持国际化多语言。
+
+- 安装 **`vue-i18n`**
+  ```python
+  // 安装vue-i18n
+  npm install vue-i18n --save
+  ```
+- 引入 **`vue-i18n`**
+
+  在`src/lang`下创建`index.js`作为根路径，引入`vue-i18n`
+
+  ```python
+  import Vue from 'vue'
+  import VueI18N from 'vue-i18n'
+  import en from './en'
+  import cn from './cn'
+
+  // 加载插件
+  Vue.use(VueI18N)
+
+  const messages = {
+      en,  // 英文语言包
+      cn  //  中文语言包
+  }
+  
+  export default i18n
+  ```
+
+- 定义语言包
+
+  ```python
+  const messages = {
+      home: {
+          title: '书城',
+          ......
+      },
+      category: {},
+      .....
+  }
+  ```
+
+- 在 **`main.js`** 中引入 **`lang`**
+
+  ```python
+  // 引入多语言
+  import i18n from './lang'
+
+  new Vue({
+      router,
+      store,
+      i18n,
+      render: h => h(App
+  )}).$mount('#app')
+  ```
+
+
+1、全局样式的改变
+   DOM动态添加或删除CSS样式
