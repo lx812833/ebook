@@ -487,5 +487,86 @@ initFontFamily() {
   ```
 
 
-1、全局样式的改变
-   DOM动态添加或删除CSS样式
+#### 3.4、全局样式的改变
+
+上次实现了标题栏和菜单栏样式的改变，但并没有涉及到全局样式的改变。这次实阅读器全局样式的改变。
+采用链接的方式在 HTML 中导入 CSS，即使用 HTML 头部的  `<head>`标签引入外部的 CSS 文件
+
+```python
+<link rel="stylesheet" type="text/css" href="style.css">
+```
+
+1. 将外部 CSS 文件放入 Nginx 中，获取其链接
+2. 在`src/utils/book.js`下使用 **`setAttribute`** 构建导入 CSS 文件的链接方式
+
+   ```python
+   export function addCss(href) {
+       const link = document.createElement('link')
+       link.setAttribute('rel', 'stylesheet')
+       link.setAttribute('type', 'text/css')
+       link.setAttribute('href', href)
+       document.getElementsByTagName('head')[0].appendChild(link)
+   }
+   ```
+
+3. 在`EbookReader.vue`组件中，当 Epub 加载好后调用 **`initGlobalStyle`** 方法
+
+   ```python
+   // 初始化字体样式、字体大小、主题、全局主题
+   this.rendition.display().then(() ={
+       this.initFontSize();
+       this.initFontFamily();
+       this.initTheme();
+       this.initGlobalStyle();
+    });
+   ```
+
+   **`initGlobalStyle()`**
+
+   ```python
+   initGlobalStyle() {
+       removeAllCss()
+       switch (this.defaultTheme) {
+           case "Default":
+               addCss(`${process.env.VUE_APP_RES_URL}/theme/theme_default.css`);
+               break;
+           case "Eye":
+               addCss(`${process.env.VUE_APP_RES_URL}/theme/theme_eye.css`);
+               break;
+           case "Gold":
+               addCss(`${process.env.VUE_APP_RES_URL}/theme/theme_gold.css`);
+               break;
+           case "Night":
+               addCss(`${process.env.VUE_APP_RES_URL}/theme/theme_night.css`);
+               break;
+           default:
+               addCss(`${process.env.VUE_APP_RES_URL}/theme/theme_default.css`);
+               break;
+        }
+    }
+   ```
+
+4. 但是，当多次点击切换样式时，header 中会逐个加载 CSS 样式，后面的覆盖前面的，影响渲染速度，故需要清楚
+
+   ```python
+   export function removeCss(href) {
+       const links = document.getElementsByTagName('link')
+       for (let i = links.length; i >= 0; i--) {
+           const link = links[i]
+           if (link && link.getAttribute('href') && link.getAttribute('href') === href) {
+               link.parentNode.removeChild(link)
+           }
+       }
+    }
+   ```
+
+   ```python
+   export function removeAllCss() {
+           removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_default.css`)
+           removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_eye.css`)
+           removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_gold.css`)
+           removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_night.css`)
+    }
+   ```
+
+5. 由于 **`initGlobalStyle()`** 方法需要在`EbookReader.vue`组件和`EbookSettingTheme.vue` 组件中调用，为提高代码复用性，故将 **`initGlobalStyle()`** 放入`src/utils/mixin.js`中。
