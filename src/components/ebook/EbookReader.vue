@@ -34,7 +34,19 @@ export default {
         process.env.VUE_APP_RES_URL + "/epub/" + this.fileName + ".epub";
       this.book = new Epub(baseUrl);
       this.setCurrentBook(this.book);
+      this.initRendition();
+      this.initGesture();
       console.log(this.book);
+      // 分页
+      this.book.ready.then(() => {
+          return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16))
+      }).then(localtions => {
+        // console.log(localtions)
+        this.setBookAvailable(true)
+      })
+    },
+    // 初始化渲染
+    initRendition() {
       // 渲染电子书 epub自带的方法       绑定#read
       this.rendition = this.book.renderTo("read", {
         width: innerWidth,
@@ -48,6 +60,28 @@ export default {
         this.initTheme();
         this.initGlobalStyle();
       });
+      // 引入放入Nginx中的字体样式
+      this.rendition.hooks.content.register(contents => {
+        Promise.all([
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/cabin.css`
+          ),
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`
+          ),
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`
+          ),
+          contents.addStylesheet(
+            `${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`
+          )
+        ]).then(res => {
+          console.log("字体全部加载完成...");
+        });
+      });
+    },
+    // 初始化手势
+    initGesture() {
       // 手势操作
       this.rendition.on("touchstart", event => {
         this.touchStartX = event.changedTouches[0].clientX;
@@ -69,25 +103,6 @@ export default {
         // 停止事件默认动作及传播
         // event.preventDefault();
         event.stopPropagation();
-      });
-      // 引入放入Nginx中的字体样式
-      this.rendition.hooks.content.register(contents => {
-        Promise.all([
-          contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/cabin.css`
-          ),
-          contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`
-          ),
-          contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`
-          ),
-          contents.addStylesheet(
-            `${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`
-          )
-        ]).then(res => {
-          console.log("字体全部加载完成...");
-        });
       });
     },
     // 设置字体样式
