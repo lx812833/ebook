@@ -28,7 +28,7 @@
         </div>
         <div class="text-wrapper">
           <span class="progress-section-text"></span>
-          <span>({{bookAvailable ? progress + '%' : '加载中...'}})</span>
+          <span>{{bookAvailable ? progress + '%' : '加载中...'}}</span>
         </div>
       </div>
     </div>
@@ -41,10 +41,70 @@ import { ebookMixin } from "../../utils/mixin";
 export default {
   mixins: [ebookMixin],
   methods: {
-    onProgressChange(progress) {},
-    onProgressInput(progress) {},
-    nextSection() {},
-    prevSection() {}
+    onProgressChange(progress) {
+      this.setProgress(progress).then(() => {
+        this.displayProgress();
+        this.updateProgressBg();
+      });
+    },
+    onProgressInput(progress) {
+      this.setProgress(progress).then(() => {
+        this.updateProgressBg();
+      });
+    },
+    // 下一章
+    nextSection() {
+      if (
+        this.section < this.currentBook.spine.length - 1 &&
+        this.bookAvailable
+      ) {
+        this.setSection(this.section + 1).then(() => {
+          this.displaySection();
+        });
+      }
+    },
+    // 上一章
+    prevSection() {
+      // section 第当前章节数
+      if (this.section > 0 && this.bookAvailable) {
+        this.setSection(this.section - 1).then(() => {
+          thia.displaySection();
+        });
+      }
+    },
+    displaySection() {
+      const sectionInfo = this.currentBook.section(this.section);
+      if (sectionInfo && sectionInfo.href) {
+        this.currentBook.rendition.display(sectionInfo.href).then(() => {
+          this.refreshLocation();
+        });
+      }
+    },
+    // 更新进度条
+    refreshLocation() {
+      const currentLocation = this.currentBook.rendition.currentLocation();
+      const progress = this.currentBook.locations.percentageFromCfi(
+        currentLocation.start.cfi
+      );
+      // console.log(progress);
+      this.setProgress(Math.floor(progress * 100));
+    },
+    // 展示分页
+    displayProgress() {
+      const cfi = this.currentBook.locations.cfiFromPercentage(
+        this.progress / 100
+      );
+      // console.log("cfi",cfi)
+      this.currentBook.rendition.display(cfi);
+    },
+    // 已走过进度条显示
+    updateProgressBg() {
+      // 获取ref = progress DOM结构
+      this.$refs.progress.style.backgroundSize = `${this.progress}% 100%`;
+    }
+  },
+  updated() {
+    this.updateProgressBg();
   }
 };
 </script>
@@ -87,8 +147,6 @@ export default {
         -webkit-appearance: none;
         height: px2rem(2);
         margin: 0 px2rem(10);
-        background: -webkit-linear-gradient(#999, #999) no-repeat #ddd;
-        background-size: 0 100% !important; 
         &:focus {
           outline: none;
         }

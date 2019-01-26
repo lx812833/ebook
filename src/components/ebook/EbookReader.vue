@@ -30,8 +30,7 @@ export default {
   },
   methods: {
     initEpub() {
-      const baseUrl =
-        process.env.VUE_APP_RES_URL + "/epub/" + this.fileName + ".epub";
+      const baseUrl = process.env.VUE_APP_RES_URL + "/epub/" + this.fileName + ".epub";
       this.book = new Epub(baseUrl);
       this.setCurrentBook(this.book);
       this.initRendition();
