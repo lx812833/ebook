@@ -455,7 +455,7 @@ initFontFamily() {
       en,  // 英文语言包
       cn  //  中文语言包
   }
-  
+
   export default i18n
   ```
 
@@ -485,7 +485,6 @@ initFontFamily() {
       render: h => h(App
   )}).$mount('#app')
   ```
-
 
 #### 3.4、全局样式的改变
 
@@ -570,3 +569,69 @@ initFontFamily() {
    ```
 
 5. 由于 **`initGlobalStyle()`** 方法需要在`EbookReader.vue`组件和`EbookSettingTheme.vue` 组件中调用，为提高代码复用性，故将 **`initGlobalStyle()`** 放入`src/utils/mixin.js`中。
+
+#### 3.5、进度条组件
+
+在`src/components/ebook` 下新建`EbookSettingProgress.vue`作为进度条组件。
+进度条组件主要用来滑动进度条切换阅读进度和查看进度的，核心部分由`input`完成。
+
+```python
+<div class="progress-wrapper">
+    <div class="progress-icon-wrapper" @click="prevSection()">
+        <span class="icon-back"></span>
+    </div>
+    <input
+        class="progress"
+        type="range"
+        max="100"
+        min="0"
+        step="1"
+        @change="onProgressChange($event.target.value)"
+        @input="onProgressInput($event.target.value)"
+        :value="progress"
+        :disabled="!bookAvailable"
+        ref="progress">
+    <div class="progress-icon-wrapper" @click="nextSection()">
+        <span class="icon-forward"></span>
+    </div>
+ </div>
+```
+
+真心觉得`CSS`还挺难的...
+
+##### input type 与 step 属性
+
+作为一个滑块组件，主要用到 **`input`** **type** 和 **step** 属性
+
+| type | 返回滑块控件的表单元素类型                                                                                                            |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| step | 设置或返回滑块控件的 step 属性值 ；step 属性规定输入字段的合法数字间隔；step 属性可以与 max 以及 min 属性配合使用，以创建合法值的范围 |
+
+再调用函数监听 **`input`** 数据变化：
+
+```python
+ @change="onProgressChange($event.target.value)"
+ @input="onProgressInput($event.target.value)"
+```
+
+##### ref
+
+[Vue 官网上对 ref 详解](https://cn.vuejs.org/v2/api/#ref)：**`ref`** 被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的  **`$refs`** 对象上。如果在普通的 **DOM** 元素上使用，引用指向的就是 **DOM**元素；如果用在子组件上，引用就指向组件实例：
+
+```python
+<!-- `vm.$refs.p` will be the DOM node -->
+    <p ref="p">hello</p>
+
+<!-- `vm.$refs.child` will be the child component instance -->
+    <child-component ref="child"></child-component>
+```
+
+关于 **`ref`** 注册时间的重要说明：因为 **`ref`** 本身是作为渲染结果被创建的，在初始渲染的时候你不能访问它们 - 它们还不存在！**`$refs`**  也不是响应式的，因此你不应该试图用它在模板中做数据绑定。
+
+**`ref`** 有三种用法：
+
+1. **`ref`** 放在普通的元素上，用 **`this.ref.name`** 获取的是 **DOM** 元素
+2. **`ref`** 放在**子组件**上，用 **`this.ref.name`** 获取的是 **`组件实例，可以使用组件的所有方法`**
+3. 利用**v-for** 和 **ref** 获取**一组数组**或者**DOM 节点**
+
+![enter image description here](https://www.wanwuxiangyang.com/ref.png)
